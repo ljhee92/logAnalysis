@@ -21,8 +21,6 @@ public class WorkDesign extends JFrame {
 		super("로그분석 프로그램");
 		this.userID = userID;
 		this.userRWX = userRWX;
-		System.out.println(userID);
-		System.out.println(userRWX);
 		
 		setLayout(null);
 		
@@ -55,9 +53,38 @@ public class WorkDesign extends JFrame {
 		add(jbtnView);
 		add(jbtnFileSelect);
 		
+		WorkEvent we = new WorkEvent(this);
+		addWindowListener(we);
+		jbtnView.addActionListener(we);
+		jbtnFileSelect.addActionListener(we);
+		
 		setBounds(200, 200, 600, 550);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}	// WorkDesign
+
+	public JLabel getJlAll() {
+		return jlAll;
+	}
+
+	public JTextField getJtfStart() {
+		return jtfStart;
+	}
+
+	public JTextField getJtfEnd() {
+		return jtfEnd;
+	}
+
+	public JTextArea getJtaContents() {
+		return jtaContents;
+	}
+
+	public JButton getJbtnView() {
+		return jbtnView;
+	}
+
+	public JButton getJbtnFileSelect() {
+		return jbtnFileSelect;
+	}
 
 }	// class
