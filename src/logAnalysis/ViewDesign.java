@@ -24,15 +24,34 @@ public class ViewDesign extends JDialog {
 		jsp.setBorder(new TitledBorder("결과물"));
 		
 		jsp.setBounds(10, 10, 460, 350);
-		jbtnReport.setBounds(50, 370, 100, 30);
+		jtaLog.setEditable(false);
+		jbtnReport.setBounds(90, 370, 120, 40);
+		jbtnExit.setBounds(230, 370, 120, 40);
 		
 		add(jsp);
 		add(jbtnReport);
 		add(jbtnExit);
 		
+		ViewEvent ve = new ViewEvent(this);
+		addWindowListener(ve);
+		jbtnReport.addActionListener(ve);
+		jbtnExit.addActionListener(ve);
+		
 		setBounds(wd.getX()+50, wd.getY()+50, 500, 450);
 		setVisible(true);
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}	// ViewDesign
+
+	public JTextArea getJtaLog() {
+		return jtaLog;
+	}
+
+	public JButton getJbtnReport() {
+		return jbtnReport;
+	}
+
+	public JButton getJbtnExit() {
+		return jbtnExit;
+	}
 
 }	// ViewDesign

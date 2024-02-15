@@ -21,6 +21,9 @@ public class WorkEvent extends WindowAdapter implements ActionListener {
 	private List<String> lineList;
 	private Map<String, String> splitedData;
 	
+	public WorkEvent() {
+	}	// WorkEvent
+	
 	public WorkEvent(WorkDesign wd) {
 		this.wd = wd;
 	}	// WorkEvent
@@ -76,27 +79,27 @@ public class WorkEvent extends WindowAdapter implements ActionListener {
 	}	// readFile
 	
 	/**
-	 * 기능 : List에 저장된 linedata를 []를 기준으로 자르는 일
+	 * 기능 : List에 저장된 linedata를 대괄호를 기준으로 자르는 일
 	 * 1. 라인데이터 하나 불러오기
 	 * 2. 라인 맨 앞과 뒤의 [] 자르기
 	 * 3. '][' 기준으로 데이터 나누기
 	 * 4. 나눈 데이터 맵에 저장하기
-	 * 작성자 :
-	 * 작성 날짜 :
+	 * 작성자 : (추후)
+	 * 작성 날짜 : (추후)
 	 */
 	public void splitData() {
 		String test = "";
 		String[] splitArr = null;
-		splitedData = new HashMap<String, String>();
 		
-		for(String temp : lineList) {
-			test = temp.substring(1, temp.length()-1);
-			splitArr = test.split("\\]\\[");
+		for(String temp : lineList) {	// 라인데이터 불러오기
+			splitedData = new HashMap<String, String>();
+			test = temp.substring(1, temp.length()-1);	// 맨 앞, 뒤 [] 자르기
+			splitArr = test.split("\\]\\[");	// ][ 기준으로 나누기
+			splitedData.put("code", splitArr[0]);	// 맵에 저장
+			splitedData.put("url", splitArr[1]);
+			splitedData.put("browser", splitArr[2]);
+			splitedData.put("date", splitArr[3]);
 		}	// end for
-		splitedData.put("code", splitArr[0]);
-		
-		System.out.println(splitedData.get("code"));
-		
 	}	// splitData
 	
 	@Override
@@ -107,5 +110,9 @@ public class WorkEvent extends WindowAdapter implements ActionListener {
 	private void closeWd() {
 		wd.dispose();
 	}	// closeWd
+
+	public Map<String, String> getSplitedData() {
+		return splitedData;
+	}
 
 }	// class
