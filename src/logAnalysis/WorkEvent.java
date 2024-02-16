@@ -20,6 +20,7 @@ public class WorkEvent extends WindowAdapter implements ActionListener {
 	private FileDialog fdOpen;
 	private List<String> lineList;
 	private Map<String, String> splitedData;
+	public static List<Map<String, String>> dataList;
 	
 	public WorkEvent() {
 	}	// WorkEvent
@@ -84,12 +85,14 @@ public class WorkEvent extends WindowAdapter implements ActionListener {
 	 * 2. 라인 맨 앞과 뒤의 [] 자르기
 	 * 3. '][' 기준으로 데이터 나누기
 	 * 4. 나눈 데이터 맵에 저장하기
+	 * 5. 맵을 다시 List에 저장하기
 	 * 작성자 : (추후)
 	 * 작성 날짜 : (추후)
 	 */
 	public void splitData() {
 		String test = "";
 		String[] splitArr = null;
+		dataList = new ArrayList<Map<String, String>>();
 		
 		for(String temp : lineList) {	// 라인데이터 불러오기
 			splitedData = new HashMap<String, String>();
@@ -99,6 +102,7 @@ public class WorkEvent extends WindowAdapter implements ActionListener {
 			splitedData.put("url", splitArr[1]);
 			splitedData.put("browser", splitArr[2]);
 			splitedData.put("date", splitArr[3]);
+			dataList.add(splitedData);	// 맵을 리스트에 저장
 		}	// end for
 	}	// splitData
 	

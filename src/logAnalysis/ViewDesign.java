@@ -25,8 +25,8 @@ public class ViewDesign extends JDialog {
 		
 		jsp.setBounds(10, 10, 460, 350);
 		jtaLog.setEditable(false);
-		jbtnReport.setBounds(90, 370, 120, 40);
-		jbtnExit.setBounds(230, 370, 120, 40);
+		jbtnReport.setBounds(100, 370, 120, 40);
+		jbtnExit.setBounds(260, 370, 120, 40);
 		
 		add(jsp);
 		add(jbtnReport);
@@ -37,7 +37,7 @@ public class ViewDesign extends JDialog {
 		jbtnReport.addActionListener(ve);
 		jbtnExit.addActionListener(ve);
 		
-		setBounds(wd.getX()+50, wd.getY()+50, 500, 450);
+		setBounds(wd.getX()+50, wd.getY()+50, 500, 470);
 		setVisible(true);
 //		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}	// ViewDesign
