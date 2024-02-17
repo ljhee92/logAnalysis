@@ -6,14 +6,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ViewEvent extends WindowAdapter implements ActionListener {
 	
 	private ViewDesign vd;
-	List<String> keyList;
+	private List<String> keyList;
 	
 	public ViewEvent(ViewDesign vd) {
 		this.vd = vd;
@@ -37,7 +39,7 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 	
 	private void setResult() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("1. 최다 사용 키의 이름과 횟수 : ").append("\n\n")
+		sb.append("1. 최다 사용 키의 이름과 횟수 : ").append(parseMaxKey()).append("\n\n")
 		.append("2. 브라우저별 접속 횟수와 비율 : ").append("\n\n")
 		.append("3. 서비스를 성공적으로 수행한 횟수 : ").append("\n\n")
 		.append("3-1. 서비스를 실패한 횟수 : ").append("\n\n")
@@ -45,10 +47,9 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 		.append("5. 비정상적인 요청이 발생한 횟수와 비율 : ").append("\n\n")
 		.append("6. books에 대한 요청 URL 중 에러가 발생한 횟수와 비율 : ");
 		vd.getJtaLog().setText(sb.toString());
-		parseKey();
 	}	// setResult
 	
-	private void parseKey() {
+	private String parseMaxKey() {
 		String url, key;
 		int indStart, indEnd;
 		keyList = new ArrayList<String>();
@@ -62,12 +63,25 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 				keyList.add(key);
 			}	// end if
 		}	// end for
-//		Set<String> keySet = new HashSet<String>(keyList);
-//		for(String keyName : keySet) {
-//			System.out.println(keyName + ": " + Collections.frequency(keyList, keySet));
-//		}
+		
+		Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
+		
+		// keyName의 빈도 계산
+		for(String keyName : keyList) {
+			frequencyMap.put(keyName, frequencyMap.getOrDefault(keyName, 0) + 1);
+		}	// end for
+		
+		// 빈도 중 최대값 찾기
+		int maxFrequency = Collections.max(frequencyMap.values());
+		
+		// Map.Entry로 키쌍(키 이름-최대 빈도) 비교
+		for(Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
+			if(entry.getValue() == maxFrequency) {
+				return entry.getKey() + ", " + entry.getValue() + "회";
+			}	// end if
+		}	// end for
+		return "";
 	}	// parseKey
-	
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
