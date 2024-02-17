@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +16,6 @@ import java.util.Set;
 public class ViewEvent extends WindowAdapter implements ActionListener {
 	
 	private ViewDesign vd;
-	private List<String> keyList;
 	
 	public ViewEvent(ViewDesign vd) {
 		this.vd = vd;
@@ -40,19 +40,29 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 	private void setResult() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("1. 최다 사용 키의 이름과 횟수 : ").append(parseMaxKey()).append("\n\n")
-		.append("2. 브라우저별 접속 횟수와 비율 : ").append("\n\n")
+		.append("2. 브라우저별 접속 횟수와 비율 : ").append("\n").append(parseBrowser()).append("\n\n")
 		.append("3. 서비스를 성공적으로 수행한 횟수 : ").append("\n\n")
 		.append("3-1. 서비스를 실패한 횟수 : ").append("\n\n")
 		.append("4. 요청이 가장 많은 시간 : ").append("\n\n")
 		.append("5. 비정상적인 요청이 발생한 횟수와 비율 : ").append("\n\n")
 		.append("6. books에 대한 요청 URL 중 에러가 발생한 횟수와 비율 : ");
 		vd.getJtaLog().setText(sb.toString());
+//		parseBrowser();
 	}	// setResult
 	
+	/**
+	 * 최다 사용 키의 이름과 횟수를 얻는 일
+	 * 1. WorkEvent class의 dataList(줄별 Map이 들어있는 List)에서 url만 가져오고,
+	 * 2. url 중 key= 가 붙어 있다면 key= 부터 & 까지 텍스트를 잘라 키의 이름들을 얻는다.
+	 * 3. 얻은 키의 이름들을 keyList에 저장하고,
+	 * 4. 키별 빈도를 계산하여 "키 이름 : 빈도"로 frequencyMap에 저장한다.
+	 * 5. frequencyMap의 빈도 중 최대값을 찾고 Map.Entry와 비교하여 텍스트값을 반환한다. 
+	 * @return 최다 사용 키, 횟수
+	 */
 	private String parseMaxKey() {
 		String url, key;
 		int indStart, indEnd;
-		keyList = new ArrayList<String>();
+		List<String> keyList = new ArrayList<String>();
 		
 		for(int i = 0; i < WorkEvent.dataList.size(); i++) {
 			url = WorkEvent.dataList.get(i).get("url");
@@ -82,6 +92,28 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 		}	// end for
 		return "";
 	}	// parseKey
+	
+	private String parseBrowser() {
+		String browser;
+		List<String> browserList = new ArrayList<String>();
+		for(int i = 0; i < WorkEvent.dataList.size(); i++) {
+			browser = WorkEvent.dataList.get(i).get("browser");
+			browserList.add(browser);
+		}	// end for
+		
+		int frequency;
+		double ratio;
+		int totalBrowserList = browserList.size();
+		DecimalFormat decimalformat = new DecimalFormat("0.00");
+		List<String> browserResult = new ArrayList<String>();
+		Set<String> browserSet = new HashSet<String>(browserList);
+		for (String browserName : browserSet) {
+            frequency = Collections.frequency(browserList, browserName);
+            ratio = (double)frequency / totalBrowserList * 100;
+            browserResult.add(browserName + " : " + frequency + "회 (" + decimalformat.format(ratio) + "%)");
+        }	// end for
+		return browserResult.toString();
+	}	// parseBrowser
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
