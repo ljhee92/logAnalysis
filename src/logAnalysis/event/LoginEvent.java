@@ -34,7 +34,7 @@ public class LoginEvent extends WindowAdapter implements ActionListener {
 		}	// end if
 		
 		if(!userCheck()) {
-			JOptionPane.showMessageDialog(ld, "로그인 실패");
+//			JOptionPane.showMessageDialog(ld, "로그인 실패");
 			return;
 		}	// end if
 		
@@ -49,22 +49,6 @@ public class LoginEvent extends WindowAdapter implements ActionListener {
 		}	// end for
 		new WorkDesign(userID, userRWX);
 		closeLd();
-		
-//		if(!(inputID == null || inputPW == null || inputID.isEmpty() || inputPW.isEmpty())) {
-//			if(!userCheck()) {
-//				JOptionPane.showMessageDialog(ld, "로그인 실패");
-//				return;
-//			}	// end if
-//			JOptionPane.showMessageDialog(ld, inputID + "님 로그인 성공");
-//			
-//			String userID;
-//			boolean userRWX;
-//			for(MemberVO member : members) {
-//				
-//			}	// end for
-//			new WorkDesign(inputID);
-//			closeLd();
-//		}	// end if
 	}	// login
 	
 	private boolean chkNull() {
@@ -94,8 +78,15 @@ public class LoginEvent extends WindowAdapter implements ActionListener {
 		for(MemberVO member : members) {
 			if(member != null && inputID.equals(member.getId()) && inputPW.equals(member.getPw())){
 				return true;
-			}	// end if
+			} else if(member != null && inputID.equals(member.getId()) && !inputPW.equals(member.getPw())) {
+				JOptionPane.showMessageDialog(ld, "비밀번호를 확인해주세요.");
+				return false;
+			} else if(member != null && !inputID.equals(member.getId()) && inputPW.equals(member.getPw())) {
+				JOptionPane.showMessageDialog(ld, "아이디를 확인해주세요.");
+				return false;
+			}	// end else
 		}	// end for
+		JOptionPane.showMessageDialog(ld, "등록되지 않은 계정입니다.");
 		return false;
 	}	// login
 
