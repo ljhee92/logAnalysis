@@ -34,7 +34,6 @@ public class LoginEvent extends WindowAdapter implements ActionListener {
 		}	// end if
 		
 		if(!userCheck()) {
-//			JOptionPane.showMessageDialog(ld, "로그인 실패");
 			return;
 		}	// end if
 		
