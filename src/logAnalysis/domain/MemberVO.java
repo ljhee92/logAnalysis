@@ -1,4 +1,4 @@
-package logAnalysis;
+package logAnalysis.domain;
 
 public class MemberVO {
 	

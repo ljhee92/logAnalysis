@@ -1,19 +1,29 @@
-package logAnalysis;
+package logAnalysis.design;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+
+import logAnalysis.event.ViewEvent;
 
 @SuppressWarnings("serial")
 public class ViewDesign extends JDialog {
 	
 	private JTextArea jtaLog;
 	private JButton jbtnReport, jbtnExit;
+	private String userID;
+	private boolean userRWX;
+	private JTextField jtfStart, jtfEnd;
 	
 	public ViewDesign(WorkDesign wd) {
 		super(wd, "필요한 정보", true);
+		this.userID = wd.getUserID();
+		this.userRWX = wd.isUserRWX();
+		this.jtfStart = wd.getJtfStart();
+		this.jtfEnd = wd.getJtfEnd();
 		
 		setLayout(null);
 		
@@ -41,6 +51,14 @@ public class ViewDesign extends JDialog {
 		setVisible(true);
 //		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	}	// ViewDesign
+	
+	public JTextField getJtfStart() {
+		return jtfStart;
+	}
+
+	public JTextField getJtfEnd() {
+		return jtfEnd;
+	}
 
 	public JTextArea getJtaLog() {
 		return jtaLog;
@@ -52,6 +70,14 @@ public class ViewDesign extends JDialog {
 
 	public JButton getJbtnExit() {
 		return jbtnExit;
+	}
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public boolean isUserRWX() {
+		return userRWX;
 	}
 
 }	// ViewDesign

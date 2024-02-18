@@ -1,4 +1,4 @@
-package logAnalysis;
+package logAnalysis.design;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -7,11 +7,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import logAnalysis.event.WorkEvent;
+
 @SuppressWarnings("serial")
 public class WorkDesign extends JFrame {
 	
 	private String userID;
-	public boolean userRWX;
+	private boolean userRWX;
 	private JLabel jlStart, jlEnd, jlAll;
 	private JTextField jtfStart, jtfEnd;
 	private JTextArea jtaContents;
@@ -85,6 +87,14 @@ public class WorkDesign extends JFrame {
 
 	public JButton getJbtnFileSelect() {
 		return jbtnFileSelect;
+	}
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public boolean isUserRWX() {
+		return userRWX;
 	}
 
 }	// class

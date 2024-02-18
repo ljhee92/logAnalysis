@@ -1,11 +1,16 @@
-package logAnalysis;
+package logAnalysis.event;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,9 +18,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
+import logAnalysis.design.ViewDesign;
+
 public class ViewEvent extends WindowAdapter implements ActionListener {
 	
 	private ViewDesign vd;
+	private String url, key, code;
+	private int indStart, indEnd, frequency, maxFrequency, totalCodeList;
+	private double ratio;
+	private DecimalFormat decimalformat = new DecimalFormat("0.00");
+	private List<String> codeList;
 	
 	public ViewEvent(ViewDesign vd) {
 		this.vd = vd;
@@ -24,13 +38,33 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == vd.getJbtnReport()) {
-			System.out.println("버튼 클릭 테스트");
+			if(!vd.isUserRWX()) {
+				JOptionPane.showMessageDialog(vd, vd.getUserID() + "계정은 파일을 다운로드할 수 없습니다.");
+				return;
+			}	// end if
+			saveFile();
 		}	// end if
 		
 		if(e.getSource() == vd.getJbtnExit()) {
 			closeDialog();
 		}	// end if
 	}	// actionPerformed
+	
+	private void saveFile() {
+		File saveFile = new File("/Users/juhee/eclipse-workspace/logAnalysis/report"); 
+		Calendar cal = Calendar.getInstance();
+		saveFile.mkdirs();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try(FileWriter fw = new FileWriter(saveFile + "/report_" + cal.getTimeInMillis() + ".dat")){
+			fw.write("---------------------------------------------------------\n("
+			+ WorkEvent.readFile.getName() + ") log (생성된 날짜 " + sdf.format(cal.getTimeInMillis()) + ")\n"
+			+ "---------------------------------------------------------\n" + vd.getJtaLog().getText());
+			fw.flush();
+			JOptionPane.showMessageDialog(vd, "파일이 저장되었습니다.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	// end catch
+	}	// saveFile
 
 	@Override
 	public void windowOpened(WindowEvent e) {
@@ -45,12 +79,12 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 		.append("3-1. 서비스를 실패한 횟수 : ").append(parseCode("404")).append("\n\n")
 		.append("4. 요청이 가장 많은 시간 : ").append(parseTime()).append("\n\n")
 		.append("5. 비정상적인 요청이 발생한 횟수와 비율 : ").append(parseCode("403")).append("\n\n")
-		.append("6. books에 대한 요청 URL 중 에러가 발생한 횟수와 비율 : ");
+		.append("6. books에 대한 요청 URL 중 에러가 발생한 횟수와 비율 : ").append(parseBooksError());
 		vd.getJtaLog().setText(sb.toString());
 	}	// setResult
 	
 	/**
-	 * 최다 사용 키의 이름과 횟수를 얻는 일
+	 * 기능 : 최다 사용 키의 이름과 횟수를 얻는 일
 	 * 1. WorkEvent class의 dataList(줄별 Map이 들어있는 List)에서 url만 가져오고,
 	 * 2. url 중 key= 가 붙어 있다면 key= 부터 & 까지 텍스트를 잘라 키의 이름들을 얻는다.
 	 * 3. 얻은 키의 이름들을 keyList에 저장하고,
@@ -59,11 +93,8 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 	 * @return 최다 사용 키, 횟수
 	 */
 	private String parseMaxKey() {
-		String url, key;
-		int indStart, indEnd;
 		List<String> keyList = new ArrayList<String>();
-		
-		for(int i = 0; i < WorkEvent.dataList.size(); i++) {
+		for(int i = Integer.parseInt(vd.getJtfStart().getText())-1; i < Integer.parseInt(vd.getJtfEnd().getText()); i++) {
 			url = WorkEvent.dataList.get(i).get("url");
 			indStart = url.indexOf("key=") + 4;
 			indEnd = url.indexOf("&");
@@ -80,7 +111,7 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 		}	// end for
 		
 		// 빈도 중 최대값 찾기
-		int maxFrequency = Collections.max(frequencyMap.values());
+		maxFrequency = Collections.max(frequencyMap.values());
 		// Map.Entry로 키쌍(키 이름-최대 빈도) 비교
 		for(Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
 			if(entry.getValue() == maxFrequency) {
@@ -93,15 +124,12 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 	private String parseBrowser() {
 		String browser;
 		List<String> browserList = new ArrayList<String>();
-		for(int i = 0; i < WorkEvent.dataList.size(); i++) {
+		for(int i = Integer.parseInt(vd.getJtfStart().getText())-1; i < Integer.parseInt(vd.getJtfEnd().getText()); i++) {
 			browser = WorkEvent.dataList.get(i).get("browser");
 			browserList.add(browser);
 		}	// end for
 		
-		int frequency;
-		double ratio;
 		int totalBrowserList = browserList.size();
-		DecimalFormat decimalformat = new DecimalFormat("0.00");
 		List<String> browserResult = new ArrayList<String>();
 		Set<String> browserSet = new HashSet<String>(browserList);
 		for(String browserName : browserSet) {
@@ -118,43 +146,49 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 	}	// parseBrowser
 	
 	private String parseCode(String codeNum) {
-		String code;
-		List<String> codeList = new ArrayList<String>();
-		for(int i = 0; i < WorkEvent.dataList.size(); i++) {
+		codeList = new ArrayList<String>();
+		for(int i = Integer.parseInt(vd.getJtfStart().getText())-1; i < Integer.parseInt(vd.getJtfEnd().getText()); i++) {
 			code = WorkEvent.dataList.get(i).get("code");
 			codeList.add(code);
 		}	// end for
 		
-		int frequency;
-		double ratio;
-		int totalCodeList = codeList.size();
-		DecimalFormat decimalformat = new DecimalFormat("0.00");
+		totalCodeList = codeList.size();
 		Set<String> codeSet = new HashSet<String>(codeList);
 		Map<String, Integer> codeMap = new HashMap<String, Integer>();
 		for(String codeName : codeSet) {
 			frequency = Collections.frequency(codeList, codeName);
 			codeMap.put(codeName, frequency);
 		}	// end for
-		ratio = (double)codeMap.get(codeNum) / totalCodeList * 100; 
-		if(codeNum.equals("200")) {
-			return codeMap.get("200") + "회";
-		} else if(codeNum.equals("500")) {
-			return codeMap.get("500") + "회";
-		} else if(codeNum.equals("403")) {
-			return codeMap.get("403") + "회 (" + decimalformat.format(ratio) + "%)";
-		} else if(codeNum.equals("404")) {
-			return codeMap.get("404") + "회";
+		if(codeMap.get(codeNum) == null) {
+			ratio = 0.00;
+			if(codeNum.equals("200") || codeNum.equals("500") || codeNum.equals("404")) {
+				return "0회";
+			} else if(codeNum.equals("403")) {
+				return "0회 (" + decimalformat.format(ratio) + "%)";
+			} else {
+				System.err.println("코드 번호를 확인해주세요.");
+			}	// end else
 		} else {
-			System.err.println("코드 번호를 확인해주세요.");
+			ratio = (double)codeMap.get(codeNum) / totalCodeList * 100;
+			if(codeNum.equals("200")) {
+				return codeMap.get("200") + "회";
+			} else if(codeNum.equals("500")) {
+				return codeMap.get("500") + "회";
+			} else if(codeNum.equals("403")) {
+				return codeMap.get("403") + "회 (" + decimalformat.format(ratio) + "%)";
+			} else if(codeNum.equals("404")) {
+				return codeMap.get("404") + "회";
+			} else {
+				System.err.println("코드 번호를 확인해주세요.");
+			}	// end else
 		}	// end else
 		return "";
 	}	// parseCode
 	
 	private String parseTime() {
 		String date, time;
-		int indStart, indEnd;
 		List<String> dateList = new ArrayList<String>();
-		for(int i = 0; i < WorkEvent.dataList.size(); i++) {
+		for(int i = Integer.parseInt(vd.getJtfStart().getText())-1; i < Integer.parseInt(vd.getJtfEnd().getText()); i++) {
 			date = WorkEvent.dataList.get(i).get("date");
 			indStart = date.indexOf(" ") + 1;
 			indEnd = date.indexOf(":");
@@ -167,7 +201,7 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 			frequencyMap.put(whatTime, frequencyMap.getOrDefault(whatTime, 0) + 1);
 		}	// end for
 		
-		int maxFrequency = Collections.max(frequencyMap.values());
+		maxFrequency = Collections.max(frequencyMap.values());
 		for(Map.Entry<String, Integer> entry : frequencyMap.entrySet()) {
 			if(entry.getValue() == maxFrequency) {
 				return entry.getKey() + "시";
@@ -175,6 +209,30 @@ public class ViewEvent extends WindowAdapter implements ActionListener {
 		}	// end for
 		return "";
 	}	// parseTime
+	
+	private String parseBooksError() {
+		codeList = new ArrayList<String>();
+		for(int i = Integer.parseInt(vd.getJtfStart().getText())-1; i < Integer.parseInt(vd.getJtfEnd().getText()); i++) {
+			url = WorkEvent.dataList.get(i).get("url");
+			code = WorkEvent.dataList.get(i).get("code");
+			if(url.contains("books?")) {
+				codeList.add(code);
+			}	// end if
+		}	// end for
+		totalCodeList = codeList.size();
+		Set<String> codeSet = new HashSet<String>(codeList);
+		Map<String, Integer> codeMap = new HashMap<String, Integer>();
+		for(String codeName : codeSet) {
+			frequency = Collections.frequency(codeList, codeName);
+			codeMap.put(codeName, frequency);
+		}	// end for
+		if(codeMap.get("500") == null) {
+			ratio = 0.00;
+			return "0회 (" + decimalformat.format(ratio) + "%)";
+		}	// end if
+		ratio = (double)codeMap.get("500") / totalCodeList * 100;
+		return codeMap.get("500") + "회 (" + decimalformat.format(ratio) + "%)";
+	}	// parseBooksError
 	
 	@Override
 	public void windowClosing(WindowEvent e) {

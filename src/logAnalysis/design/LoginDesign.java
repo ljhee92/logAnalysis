@@ -1,4 +1,4 @@
-package logAnalysis;
+package logAnalysis.design;
 
 import java.awt.Color;
 
@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import logAnalysis.event.LoginEvent;
 
 @SuppressWarnings("serial")
 public class LoginDesign extends JFrame {
