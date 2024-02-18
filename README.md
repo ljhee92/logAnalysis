@@ -10,7 +10,7 @@ sist에서 운영하는 사이트 https://sist.co.kr 사용자들의 검색 정�
 - 2024.02.13(화) ~ 2024.02.18(일)
 
 ## 💾 프로그램 구성 및 흐름
-
+![flow chart](https://github.com/ljhee92/logAnalysis/blob/master/img/flow%20chart.png)
 
 ## 💻 개발 환경
 - **Version** : Java 17
